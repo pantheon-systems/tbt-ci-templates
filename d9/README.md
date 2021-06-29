@@ -6,11 +6,11 @@ For any CI provider, you should copy the .ci folder to your project and then fol
 
 ## CircleCI
 
-Should I add this?
+TBA
 
 ## Gitlab CI
 
-Should I add this?
+TBA
 
 ## Github Actions
 
