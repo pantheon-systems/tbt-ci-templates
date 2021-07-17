@@ -2,11 +2,11 @@
 
 This folder contains different files and configurations for Drupal 8 sites.
 
-For any CI provider, you should copy the .ci folder to your project and then follow the instructions in the right section below.
+For any CI provider, you should copy the .ci folder to your project root and the corresponding folder under the providers folder also to your project root. Then, follow the instructions in the right section below.
 
 ## CircleCI
 
-If you need to enable CircleCI for an existing project, you should copy circleci to .circleci and then add the following environment variables to CircleCI configuration:
+If you need to enable CircleCI for an existing project, after copying files you should add the following environment variables to CircleCI configuration:
 
 - ADMIN_EMAIL
 - ADMIN_PASSWORD
@@ -21,7 +21,7 @@ Also, a ssh private key should be added to the project configuration and the cor
 
 ## Gitlab CI
 
-If you need to enable GitlabCI for an existing project, you should copy .gitlab-ci.yml file to your repo root and then add the following environment variables to GitlabCI configuration:
+If you need to enable GitlabCI for an existing project, after copying files you should add the following environment variables to GitlabCI configuration:
 
 - ADMIN_EMAIL
 - ADMIN_PASSWORD
@@ -38,7 +38,7 @@ The TERMINUS_BUILD_TOOLS_PROVIDER_GIT_GITLAB_URL value will be "gitlab.com" or y
 
 ## Github Actions
 
-If you need to enable Github Actions for an existing project, you should copy github to .github and then add the following secrets to Github Actions configuration:
+If you need to enable Github Actions for an existing project, after copying files you should add the following secrets to Github Actions configuration:
 
 - ADMIN_EMAIL
 - ADMIN_PASSWORD

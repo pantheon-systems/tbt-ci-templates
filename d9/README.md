@@ -2,7 +2,7 @@
 
 This folder contains different files and configurations for Drupal 9 sites.
 
-For any CI provider, you should copy the .ci folder to your project and then follow the instructions in the right section below.
+For any CI provider, you should copy the .ci folder to your project root and the corresponding folder under the providers folder also to your project root. Then, follow the instructions in the right section below.
 
 ## CircleCI
 
@@ -14,7 +14,7 @@ TBA
 
 ## Github Actions
 
-If you need to enable Github Actions for an existing project, you should copy github to .github and then add the following secrets to Github Actions configuration:
+If you need to enable Github Actions for an existing project, after copying files you should add the following secrets to Github Actions configuration:
 
 - ADMIN_EMAIL
 - ADMIN_PASSWORD
