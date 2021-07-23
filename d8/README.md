@@ -36,6 +36,23 @@ If you need to enable GitlabCI for an existing project, after copying files you 
 
 The TERMINUS_BUILD_TOOLS_PROVIDER_GIT_GITLAB_URL value will be "gitlab.com" or your gitlab instance domain.
 
+## Bitbucket Pipelines
+
+If you need to enable Bitbucket Pipelines for an existing project, after copying files you should add the following environment variables to Bitbucket Pipelines configuration:
+
+- ADMIN_EMAIL
+- ADMIN_PASSWORD
+- ADMIN_USERNAME
+- TERMINUS_TOKEN
+- TERMINUS_SITE
+- BITBUCKET_USER
+- BITBUCKET_PASS
+- BITBUCKET_AUTH
+- GIT_EMAIL
+- TEST_SITE_NAME
+- COMPOSER_AUTH
+- SSH_PRIVATE_KEY
+
 ## Github Actions
 
 If you need to enable Github Actions for an existing project, after copying files you should add the following secrets to Github Actions configuration:

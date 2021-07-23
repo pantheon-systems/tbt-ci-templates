@@ -19,6 +19,23 @@ If you need to enable CircleCI for an existing project, after copying files you 
 
 Also, a ssh private key should be added to the project configuration and the corresponding public key should be added to a Pantheon account with enough permissions over the site.
 
+## Bitbucket Pipelines
+
+If you need to enable Bitbucket Pipelines for an existing project, after copying files you should add the following environment variables to Bitbucket Pipelines configuration:
+
+- ADMIN_EMAIL
+- ADMIN_PASSWORD
+- ADMIN_USERNAME
+- TERMINUS_TOKEN
+- TERMINUS_SITE
+- BITBUCKET_USER
+- BITBUCKET_PASS
+- BITBUCKET_AUTH
+- GIT_EMAIL
+- TEST_SITE_NAME
+- COMPOSER_AUTH
+- SSH_PRIVATE_KEY
+
 ## Gitlab CI
 
 If you need to enable GitlabCI for an existing project, after copying files you should add the following environment variables to GitlabCI configuration:
