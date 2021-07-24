@@ -6,7 +6,18 @@ For any CI provider, you should copy the .ci folder to your project root and the
 
 ## CircleCI
 
-TBA
+If you need to enable CircleCI for an existing project, after copying files you should add the following environment variables to CircleCI configuration:
+
+- ADMIN_EMAIL
+- ADMIN_PASSWORD
+- ADMIN_USERNAME
+- TERMINUS_TOKEN
+- TERMINUS_SITE
+- GITHUB_TOKEN
+- GIT_EMAIL
+- TEST_SITE_NAME
+
+Also, a ssh private key should be added to the project configuration and the corresponding public key should be added to a Pantheon account with enough permissions over the site.
 
 ## Gitlab CI
 
