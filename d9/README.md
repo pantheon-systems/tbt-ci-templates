@@ -10,7 +10,20 @@ TBA
 
 ## Gitlab CI
 
-TBA
+If you need to enable GitlabCI for an existing project, after copying files you should add the following environment variables to GitlabCI configuration:
+
+- ADMIN_EMAIL
+- ADMIN_PASSWORD
+- ADMIN_USERNAME
+- TERMINUS_TOKEN
+- TERMINUS_SITE
+- GITLAB_TOKEN
+- GIT_EMAIL
+- TEST_SITE_NAME
+- SSH_PRIVATE_KEY
+- TERMINUS_BUILD_TOOLS_PROVIDER_GIT_GITLAB_URL
+
+The TERMINUS_BUILD_TOOLS_PROVIDER_GIT_GITLAB_URL value will be "gitlab.com" or your gitlab instance domain.
 
 ## Github Actions
 
