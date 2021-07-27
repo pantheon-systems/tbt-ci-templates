@@ -22,7 +22,6 @@ stages:
   - visual-test
   - behat-test
   - cleanup
-  - cleanup
   - updates
 
 before_script:
