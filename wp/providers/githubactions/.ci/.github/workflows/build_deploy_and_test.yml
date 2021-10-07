@@ -158,6 +158,9 @@ jobs:
       - name: run PHP build step
         run: ./.ci/build/php
 
+  # If needed, frontend assets compilation or similar steps
+  # could be added here.
+
   deploy_to_pantheon:
     container:
       image: quay.io/pantheon-public/build-tools-ci:6.x
