@@ -8,8 +8,8 @@ set -eo pipefail
 # Otherwise a multidev environment is used.
 #
 
-# Uncomment the following line to use gitignore cut mechanism.
-#terminus build:gitignore:cut
+# Cut gitignore at the cut mark.
+terminus build:gitignore:cut
 
 # Authenticate with Terminus
 terminus -n auth:login --machine-token="$TERMINUS_TOKEN"
