@@ -61,6 +61,9 @@ test:static:
     - merge_requests
     - master
 
+# If needed, frontend assets compilation or similar steps
+# could be added here.
+
 deploy:pantheon:
   stage: deploy
   environment:

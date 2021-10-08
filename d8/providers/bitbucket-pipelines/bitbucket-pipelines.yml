@@ -51,6 +51,10 @@ default_steps: &default_steps
           - web/**
           - vendor/**
           - drush/**
+
+  # If needed, frontend assets compilation or similar steps
+  # could be added here.
+
   - step:
       name: Deploy to Pantheon
       services:
