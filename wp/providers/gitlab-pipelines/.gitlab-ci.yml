@@ -80,21 +80,31 @@ build:php:
 # If needed, frontend assets compilation or similar steps
 # could be added here.
 
-deploy:pantheon:
+deploy:dev:
   stage: deploy
   environment:
-    name: deploy/$TERMINUS_ENV
-    url: https://$TERMINUS_ENV-$TERMINUS_SITE.pantheonsite.io/
+    name: deploy/master
+    url: https://dev-$TERMINUS_SITE.pantheonsite.io
   script:
-  - echo "Target site.env is $TERMINUS_SITE.$TERMINUS_ENV"
-  - ./.ci/deploy/pantheon/dev-multidev
-  dependencies:
-  - build:php
+    - echo "Target site.env is $TERMINUS_SITE.dev"
+    - ./.ci/deploy/pantheon/dev-multidev
   only:
-  - merge_requests
-  - master
+    - master
   except:
-  - schedules
+    - schedules
+
+deploy:multidev:
+  stage: deploy
+  environment:
+    name: deploy/pr-$CI_MERGE_REQUEST_IID
+    url: https://pr-$CI_MERGE_REQUEST_IID-$TERMINUS_SITE.pantheonsite.io
+  script:
+    - echo "Target site.env is $TERMINUS_SITE.pr-$CI_MERGE_REQUEST_IID"
+    - ./.ci/deploy/pantheon/dev-multidev
+  only:
+    - merge_requests
+  except:
+    - schedules
 
 test:visual-regression:
   stage: visual-test
@@ -118,7 +128,6 @@ test:visual-regression:
       - backstop_data
   dependencies:
     - configure:env-vars
-    - deploy:pantheon
   only:
   - merge_requests
   except:
@@ -135,7 +144,6 @@ test:behat:
     paths:
       - behat-screenshots
   dependencies:
-    - deploy:pantheon
     - test:visual-regression
   only:
   - merge_requests
