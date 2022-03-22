@@ -233,6 +233,8 @@ jobs:
 
       # Deploy to Pantheon
       - name: deploy to Pantheon
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           echo "$SSH_PRIVATE_KEY" > ../private.key
           chmod 600 ../private.key
