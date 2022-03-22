@@ -79,6 +79,7 @@ build:php:
 
 deploy:dev:
   stage: deploy
+  dependencies: []
   environment:
     name: deploy/master
     url: https://dev-$TERMINUS_SITE.pantheonsite.io
@@ -90,6 +91,7 @@ deploy:dev:
 
 deploy:multidev:
   stage: deploy
+  dependencies: []
   environment:
     name: deploy/pr-$CI_MERGE_REQUEST_IID
     url: https://pr-$CI_MERGE_REQUEST_IID-$TERMINUS_SITE.pantheonsite.io
