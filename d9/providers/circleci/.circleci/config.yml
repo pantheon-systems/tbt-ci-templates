@@ -103,6 +103,40 @@ jobs:
           paths:
             - $HOME/.composer/cache
 
+  build_php:
+    <<: *defaults
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - composer-cache-{{ checksum "composer.lock" }}
+            - composer-cache-
+            - vendor-{{ checksum "composer.lock" }}
+            - vendor-
+
+      - run:
+          # Set TERMINUS_ENV and related environment variables.
+          # https://github.com/pantheon-systems/docker-build-tools-ci/blob/6.x/scripts/set-environment
+          name: setup-environment-vars
+          command: /build-tools-ci/scripts/set-environment
+
+      - run:
+          name: run PHP build step
+          command: ./.ci/build/php
+
+      - save_cache:
+          key: vendor-{{ checksum "composer.lock" }}
+          paths:
+            - $CIRCLE_WORKING_DIRECTORY/vendor
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - web
+            - vendor
+            - drush
+
   # If needed, frontend assets compilation or similar steps
   # could be added here.
 
@@ -220,9 +254,11 @@ workflows:
     jobs:
       - configure_env_vars
       - static_tests
+      - build_php
       - deploy_to_pantheon:
           requires:
             - static_tests
+            - build_php
       - visual_regression_test:
           requires:
             - configure_env_vars
