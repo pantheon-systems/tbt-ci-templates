@@ -23,6 +23,20 @@ env:
 
 
 jobs:
+  set_checkout_ref:
+    runs-on: ubuntu-latest
+    outputs:
+      checkout_ref: ${{ steps.set_checkout_ref.outputs.checkout_ref }}
+    steps:
+      - name: Set checkout reference
+        id: set_checkout_ref
+        run: |
+          if [ ${{ github.event_name }} == 'push' ]; then
+            echo "::set-output name=checkout_ref::${{ github.ref }}"
+          elif [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            echo "::set-output name=checkout_ref::${{ github.event.pull_request.head.ref }}"
+          fi
+
   configure_env_vars:
     container:
       image: quay.io/pantheon-public/build-tools-ci:8.x-php7.4
