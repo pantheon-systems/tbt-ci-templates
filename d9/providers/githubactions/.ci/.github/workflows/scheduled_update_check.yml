@@ -7,7 +7,6 @@ defaults:
     shell: bash
 env:
   TZ: "/usr/share/zoneinfo/America/Los_Angeles"
-  NOTIFY: 'scripts/github/add-commit-comment {project} {sha} "Created multidev environment [{site}#{env}]({dashboard-url})." {site-url}'
   TERM: dumb
   ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
   ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
