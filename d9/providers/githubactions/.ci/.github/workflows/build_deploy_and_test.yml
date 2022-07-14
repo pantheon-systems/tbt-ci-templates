@@ -80,7 +80,6 @@ jobs:
           echo "export ARTIFACTS_DIR_URL='${GITHUB_WORKFLOW_URL}/#artifacts'" >> $BASH_ENV
 
   static_tests:
-
     container:
       image: quay.io/pantheon-public/build-tools-ci:8.x-php7.4
       options: --user root
@@ -206,6 +205,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Set bash_env env var
         run: echo BASH_ENV=${RUNNER_TEMP}/bash_env.txt >> $GITHUB_ENV
@@ -317,6 +318,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
+          ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
 
       - name: Set bash_env env var
