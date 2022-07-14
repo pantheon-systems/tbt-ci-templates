@@ -1,5 +1,11 @@
 # Drupal 8
 
+## Note
+
+Given that Drupal 8 is EOL since November 2021, this is NOT MAINTAINED anymore.
+
+-----
+
 This folder contains different files and configurations for Drupal 8 sites.
 
 For any CI provider, you should copy the .ci folder to your project root and the corresponding folder under the providers folder also to your project root. Then, follow the instructions in the right section below.
