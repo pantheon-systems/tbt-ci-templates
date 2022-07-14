@@ -358,19 +358,12 @@ jobs:
 
   visual_regression_test:
     container:
-      image: backstopjs/backstopjs:5.3.2
+      image: backstopjs/backstopjs:6.1.0
       options: --user root
     runs-on: ubuntu-latest
     if: ${{ github.ref != 'refs/heads/master' }}
     needs: [configure_env_vars, behat_test]
     steps:
-      - name: Update git version
-        run: |
-          echo "deb http://ppa.launchpad.net/git-core/ppa/ubuntu xenial main" >> /etc/apt/sources.list
-          apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
-          apt update -y
-          apt install -y git
-
       - name: Checkout
         uses: actions/checkout@v2
         with:
