@@ -26,6 +26,9 @@ else
     terminus -n build:env:push "$TERMINUS_SITE.dev" --yes
 fi
 
+# Wake the environment to make sure the database is reachable.
+terminus -n env:wake "$TERMINUS_SITE.$TERMINUS_ENV"
+
 # Run update-db to ensure that the cloned database is updated for the new code.
 terminus -n wp $TERMINUS_SITE.$TERMINUS_ENV -- core update-db
 
