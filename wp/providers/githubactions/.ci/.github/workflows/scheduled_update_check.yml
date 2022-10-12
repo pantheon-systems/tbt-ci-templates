@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -39,7 +39,7 @@ jobs:
         run: echo BASH_ENV=${RUNNER_TEMP}/bash_env.txt >> $GITHUB_ENV
 
       - name: Cache bash_env.txt
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-bash-env
         with:
