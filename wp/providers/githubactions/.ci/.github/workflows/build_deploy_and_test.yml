@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref || github.ref_name }}
 
@@ -38,7 +38,7 @@ jobs:
         run: echo BASH_ENV=${RUNNER_TEMP}/bash_env.txt >> $GITHUB_ENV
 
       - name: Cache bash_env.txt
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-bash-env
         with:
@@ -83,12 +83,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Cache composer cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-composer-cache
         with:
@@ -115,12 +115,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Cache composer cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-composer-cache
         with:
@@ -132,7 +132,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache vendor folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-vendor
         with:
@@ -140,7 +140,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/composer.lock') }}
 
       - name: Cache web folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-web
         with:
@@ -148,7 +148,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_number }}
 
       - name: Cache drush folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-drush
         with:
@@ -174,7 +174,7 @@ jobs:
     needs: [configure_env_vars, static_tests, build_php]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref || github.ref_name }}
@@ -183,7 +183,7 @@ jobs:
         run: echo BASH_ENV=${RUNNER_TEMP}/bash_env.txt >> $GITHUB_ENV
 
       - name: Cache bash_env.txt
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-bash-env
         with:
@@ -195,7 +195,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache composer cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-composer-cache
         with:
@@ -207,7 +207,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache vendor folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-vendor
         with:
@@ -215,7 +215,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/composer.lock') }}
 
       - name: Cache web folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-web
         with:
@@ -223,7 +223,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_number }}
 
       - name: Cache drush folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-drush
         with:
@@ -260,7 +260,7 @@ jobs:
     needs: [deploy_to_pantheon]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref || github.ref_name }}
 
@@ -268,7 +268,7 @@ jobs:
         run: echo BASH_ENV=${RUNNER_TEMP}/bash_env.txt >> $GITHUB_ENV
 
       - name: Cache bash_env.txt
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-bash-env
         with:
@@ -280,7 +280,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache composer cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-composer-cache
         with:
@@ -292,7 +292,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache vendor folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-vendor
         with:
@@ -300,7 +300,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/composer.lock') }}
 
       - name: Cache web folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-web
         with:
@@ -308,7 +308,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_number }}
 
       - name: Cache drush folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-drush
         with:
@@ -351,7 +351,7 @@ jobs:
 
       - name: Upload artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: behat-report
           path: /tmp/artifacts
@@ -365,7 +365,7 @@ jobs:
     needs: [configure_env_vars, behat_test]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref || github.ref_name }}
@@ -374,7 +374,7 @@ jobs:
         run: echo BASH_ENV=${RUNNER_TEMP}/bash_env.txt >> $GITHUB_ENV
 
       - name: Cache bash_env.txt
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-bash-env
         with:
@@ -386,7 +386,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache composer cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-composer-cache
         with:
@@ -398,7 +398,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache vendor folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-vendor
         with:
@@ -406,7 +406,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/composer.lock') }}
 
       - name: Cache web folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-web
         with:
@@ -414,7 +414,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_number }}
 
       - name: Cache drush folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-drush
         with:
@@ -430,7 +430,7 @@ jobs:
 
       - name: Upload artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: vrt-report
           path: /tmp/artifacts
