@@ -8,14 +8,11 @@ set -eo pipefail
 # Otherwise a multidev environment is used.
 #
 
-# Cut gitignore at the cut mark.
-terminus build:gitignore:cut
-
 # Authenticate with Terminus
 terminus -n auth:login --machine-token="$TERMINUS_TOKEN"
 
-# Prepare for Pantheon
-composer run prepare-for-pantheon
+# Cut gitignore at the cut mark.
+terminus build:gitignore:cut
 
 if [[ "$CI_BRANCH" != "$DEFAULT_BRANCH" ]]
 then
