@@ -88,7 +88,7 @@ default_steps: &default_steps
       artifacts:
         - behat-screenshots/**
 
-image: quay.io/pantheon-public/build-tools-ci:8.x-php7.4
+image: quay.io/pantheon-public/build-tools-ci:8.x-php8.1
 
 options:
   max-time: 30
