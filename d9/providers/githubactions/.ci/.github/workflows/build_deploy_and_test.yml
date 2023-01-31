@@ -5,7 +5,6 @@ defaults:
     shell: bash
 env:
   TZ: "/usr/share/zoneinfo/America/Los_Angeles"
-  NOTIFY: 'scripts/github/add-commit-comment {project} {sha} "Created multidev environment [{site}#{env}]({dashboard-url})." {site-url}'
   TERM: dumb
   ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
   ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
@@ -13,14 +12,15 @@ env:
   GITHUB_TOKEN: ${{ github.token }}
   TERMINUS_TOKEN: ${{ secrets.TERMINUS_TOKEN }}
   TEST_SITE_NAME: ${{ secrets.TERMINUS_SITE }}
-  CI_BRANCH: ${{ github.ref }}
+  CI_BRANCH: ${{ github.head_ref || github.ref_name }}
   COMMIT_SHA: ${{ github.sha }}
   CI_BUILD_NUMBER: ${{ github.run_number }}
   DEFAULT_SITE: ${{ secrets.TERMINUS_SITE }}
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
   GITHUB_OWNER: ${{ github.repository_owner }}
   CI_PROJECT_NAME: ${{ github.repository }}
-
+  PR_NUMBER: ${{ github.event.number }}
+  CI_PULL_REQUEST: ${{ github.event.pull_request._links.html.href }}
 
 jobs:
   configure_env_vars:
@@ -30,13 +30,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Set bash_env env var
         run: echo BASH_ENV=${RUNNER_TEMP}/bash_env.txt >> $GITHUB_ENV
 
       - name: Cache bash_env.txt
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-bash-env
         with:
@@ -47,29 +49,26 @@ jobs:
       # https://github.com/pantheon-systems/docker-build-tools-ci/blob/6.x/scripts/set-environment
       - name: setup-environment-vars
         run: |
-          if [ "$CI_BRANCH" != "refs/heads/master" ]; then
-            export PR_NUMBER=`curl -u "${GITHUB_OWNER}:${GITHUB_TOKEN}" \
-              -H "Accept: application/vnd.github.groot-preview+json" \
-              "https://api.github.com/repos/${CI_PROJECT_NAME}/commits/${COMMIT_SHA}/pulls" | \
-              python3 -c "import sys, json; print(json.load(sys.stdin)[0]['number'])"`
+          if [ "$CI_BRANCH" != "master" ]; then
+            # Test vars not set means trigger = push.
+            if [ -z "$PR_NUMBER" ]; then
+              # Var not set means trigger = push.
+              export PR_NUMBER=`curl -u "${GITHUB_OWNER}:${GITHUB_TOKEN}" \
+                -H "Accept: application/vnd.github.groot-preview+json" \
+                "https://api.github.com/repos/${CI_PROJECT_NAME}/commits/${COMMIT_SHA}/pulls" | \
+                jq '.[0].number | select(.!=null)'`
+            fi
 
-            export CI_BRANCH=`curl -u "${GITHUB_OWNER}:${GITHUB_TOKEN}" \
-              -H "Accept: application/vnd.github.groot-preview+json" \
-              "https://api.github.com/repos/${CI_PROJECT_NAME}/commits/${COMMIT_SHA}/pulls" | \
-              python3 -c "import sys, json; print(json.load(sys.stdin)[0]['head']['ref'])"`
-
-            export CI_PULL_REQUEST=`curl -u "${GITHUB_OWNER}:${GITHUB_TOKEN}" \
-              -H "Accept: application/vnd.github.groot-preview+json" \
-              "https://api.github.com/repos/${CI_PROJECT_NAME}/commits/${COMMIT_SHA}/pulls" | \
-              python3 -c "import sys, json; print(json.load(sys.stdin)[0]['html_url'])"`
-          else
-            export CI_BRANCH="master"
+            if [ -z "$CI_PULL_REQUEST" ]; then
+              export CI_PULL_REQUEST=`curl -u "${GITHUB_OWNER}:${GITHUB_TOKEN}" \
+                -H "Accept: application/vnd.github.groot-preview+json" \
+                "https://api.github.com/repos/${CI_PROJECT_NAME}/commits/${COMMIT_SHA}/pulls" | \
+                jq '.[0].html_url | select(.!=null)'`
+            fi
           fi
-          export CI_PROJECT_REPONAME=`curl -u "${GITHUB_OWNER}:${GITHUB_TOKEN}" \
-            -H "Accept: application/vnd.github.groot-preview+json" \
-            "https://api.github.com/repos/${CI_PROJECT_NAME}/commits/${COMMIT_SHA}/pulls" | \
-            python3 -c "import sys, json; print(json.load(sys.stdin)[0]['base']['repo']['name'])"`
-          export CI_PROJECT_USERNAME=$GITHUB_REPOSITORY_OWNER
+
+          export CI_PROJECT_REPONAME=${GITHUB_REPOSITORY#*/}
+          export CI_PROJECT_USERNAME=${GITHUB_REPOSITORY_OWNER}
           /build-tools-ci/scripts/set-environment
           GITHUB_WORKFLOW_URL=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
           echo "export CI_BUILD_URL='${GITHUB_WORKFLOW_URL}'" >> $BASH_ENV
@@ -84,10 +83,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Cache composer cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-composer-cache
         with:
@@ -118,15 +119,16 @@ jobs:
     needs: [configure_env_vars, static_tests]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
+          ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
 
       - name: Set bash_env env var
         run: echo BASH_ENV=${RUNNER_TEMP}/bash_env.txt >> $GITHUB_ENV
 
       - name: Cache bash_env.txt
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-bash-env
         with:
@@ -138,7 +140,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache composer cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-composer-cache
         with:
@@ -150,7 +152,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache vendor folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-vendor
         with:
@@ -158,7 +160,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/composer.lock') }}
 
       - name: Cache web folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-web
         with:
@@ -166,7 +168,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_number }}
 
       - name: Cache drush folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-drush
         with:
@@ -188,6 +190,8 @@ jobs:
           eval `ssh-agent -s`
           ssh-add ../private.key
           source $BASH_ENV
+          # Fix any dubious ownership error.
+          git config --global --add safe.directory $GITHUB_WORKSPACE
           ./.ci/deploy/pantheon/dev-multidev
 
   behat_test:
@@ -199,13 +203,15 @@ jobs:
     needs: [deploy_to_pantheon]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Set bash_env env var
         run: echo BASH_ENV=${RUNNER_TEMP}/bash_env.txt >> $GITHUB_ENV
 
       - name: Cache bash_env.txt
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-bash-env
         with:
@@ -217,7 +223,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache composer cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-composer-cache
         with:
@@ -229,7 +235,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache vendor folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-vendor
         with:
@@ -237,7 +243,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/composer.lock') }}
 
       - name: Cache web folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-web
         with:
@@ -245,7 +251,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_number }}
 
       - name: Cache drush folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-drush
         with:
@@ -288,36 +294,30 @@ jobs:
 
       - name: Upload artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: behat-report
           path: /tmp/artifacts
 
   visual_regression_test:
     container:
-      image: backstopjs/backstopjs:5.3.2
+      image: backstopjs/backstopjs:6.1.0
       options: --user root
     runs-on: ubuntu-latest
     if: ${{ github.ref != 'refs/heads/master' }}
     needs: [configure_env_vars, behat_test]
     steps:
-      - name: Update git version
-        run: |
-          echo "deb http://ppa.launchpad.net/git-core/ppa/ubuntu xenial main" >> /etc/apt/sources.list
-          apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
-          apt update -y
-          apt install -y git
-
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
+          ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
 
       - name: Set bash_env env var
         run: echo BASH_ENV=${RUNNER_TEMP}/bash_env.txt >> $GITHUB_ENV
 
       - name: Cache bash_env.txt
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-bash-env
         with:
@@ -329,7 +329,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache composer cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-composer-cache
         with:
@@ -341,7 +341,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache vendor folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-vendor
         with:
@@ -349,7 +349,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/composer.lock') }}
 
       - name: Cache web folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-web
         with:
@@ -357,7 +357,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_number }}
 
       - name: Cache drush folder
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-drush
         with:
@@ -373,7 +373,7 @@ jobs:
 
       - name: Upload artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: vrt-report
           path: /tmp/artifacts
