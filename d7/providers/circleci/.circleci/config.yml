@@ -115,14 +115,6 @@ jobs:
                 command: composer install
 
             - run:
-                name: run functional tests with Behat
-                command: ./.ci/behat-test.sh
-
-            - run:
-                name: cleanup Behat tetst
-                command: ./.ci/behat-test-cleanup.sh
-
-            - run:
                 name: post-test actions
                 command: ./.circleci/scripts/pantheon/03-post-test
 

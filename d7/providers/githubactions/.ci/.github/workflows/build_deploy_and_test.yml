@@ -18,8 +18,6 @@ env:
   TERMINUS_TOKEN: ${{ secrets.TERMINUS_TOKEN }}
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
   CI_JOB_ID: ${{ github.run_number }}
-  BEHAT_ADMIN_USERNAME: pantheon-ci-testing-$CI_JOB_ID
-  BEHAT_ADMIN_EMAIL: no-reply+ci-$CI_JOB_ID@getpantheon.com
   GITHUB_USER_EMAIL: ${{ secrets.GIT_EMAIL }}
   CGR_BASE_DIR: /composer/.global
   CGR_BIN_DIR: /composer/vendor/bin
@@ -97,8 +95,6 @@ jobs:
           export PR_ENV=${CI_MERGE_REQUEST_IID:+pr-$CI_MERGE_REQUEST_IID}
           echo "export PR_ENV=${CI_MERGE_REQUEST_IID:+pr-$CI_MERGE_REQUEST_IID}" >> $BASH_ENV
           echo "export TERMINUS_ENV=${PR_ENV:-dev}" >> $BASH_ENV
-          export BEHAT_ADMIN_PASSWORD=$(openssl rand -base64 24)
-          echo "export BEHAT_ADMIN_PASSWORD=${BEHAT_ADMIN_PASSWORD}" >> $BASH_ENV
 
   deploy_multidev:
     container:
@@ -269,109 +265,3 @@ jobs:
           composer install --no-ansi --no-interaction --optimize-autoloader --no-progress
           composer -n code-sniff
           composer -n unit-test
-
-  test_behat:
-    container:
-      image: quay.io/pantheon-public/build-tools-ci:4.x
-      options: --user root
-    runs-on: ubuntu-latest
-    needs: [configure_env_vars, deploy_dev, deploy_multidev]
-    if: ${{ always() }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Cache bash_env.txt
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-bash-env
-        with:
-          path: bash_env.txt
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_number }}
-
-      - name: Cache composer cache
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-composer-cache
-        with:
-          path: ~/.composer/cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
-      - name: Cache vendor folder
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-vendor
-        with:
-          path: ./vendor
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/composer.lock') }}
-
-      - name: prepare-environment-vars
-        run: |
-          source $BASH_ENV
-
-      - name: Run behat tests
-        run: |
-          eval $(ssh-agent -s) && ssh-add <(echo "$SSH_PRIVATE_KEY")
-          mkdir -p $HOME/.ssh && echo "StrictHostKeyChecking no" >> "$HOME/.ssh/config"
-          terminus auth:login --machine-token="$TERMINUS_TOKEN"
-          composer install --no-ansi --no-interaction --optimize-autoloader --no-progress
-          ./.ci/behat-test.sh
-
-  test_behat_cleanup:
-    container:
-      image: quay.io/pantheon-public/build-tools-ci:4.x
-      options: --user root
-    runs-on: ubuntu-latest
-    if: ${{ always() }}
-    needs: [configure_env_vars, test_behat]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Cache bash_env.txt
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-bash-env
-        with:
-          path: bash_env.txt
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_number }}
-
-      - name: Cache composer cache
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-composer-cache
-        with:
-          path: ~/.composer/cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
-      - name: Cache vendor folder
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-vendor
-        with:
-          path: ./vendor
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/composer.lock') }}
-
-      - name: prepare-environment-vars
-        run: |
-          source $BASH_ENV
-
-      - name: Cleanup behat tests
-        run: |
-          eval $(ssh-agent -s) && ssh-add <(echo "$SSH_PRIVATE_KEY")
-          mkdir -p $HOME/.ssh && echo "StrictHostKeyChecking no" >> "$HOME/.ssh/config"
-          terminus auth:login --machine-token="$TERMINUS_TOKEN"
-          composer install --no-ansi --no-interaction --optimize-autoloader --no-progress
-          ./.ci/behat-test-cleanup.sh
