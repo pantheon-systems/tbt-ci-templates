@@ -1,7 +1,0 @@
-#!/bin/bash
-
-#
-# This script runs the Behat tests.
-#
-
-# Do nothing as Behat is no longer supported in WP.
