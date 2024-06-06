@@ -9,6 +9,9 @@ set -eo pipefail
 #
 
 # Cut gitignore at the cut mark.
+terminus build:gitignore:cut
+
+# Run build-assets script in case it is needed.
 composer -n build-assets
 
 # Authenticate with Terminus
