@@ -1,12 +1,13 @@
+# Managed by github-terraform — do not edit manually
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: tbt-ci-templates
-  description: Auto-generated catalog info for pantheon-systems/tbt-ci-templates
+  name: "tbt-ci-templates"
+  description: "CI Integrations for Terminus Build Tools template repos"
   annotations:
-    backstage.io/techdocs-ref: dir:docs/
+    "backstage.io/techdocs-ref": "dir:docs/"
 spec:
-  type: library
-  lifecycle: mature
-  owner: devx
+  type: "library"
+  lifecycle: "mature"
+  owner: "developer-experience"
